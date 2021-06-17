@@ -90,6 +90,7 @@ def main_loop(url, headers):
                 )
 
         except TypeError:
+            print("Вы в бане у Яндекса, попробуйте позже")
             break
 
         finally:
@@ -98,7 +99,10 @@ def main_loop(url, headers):
             url = get_next_page_url(data)
 
             if url is None:
+                print("Вы в бане у Яндекса, попробуйте позже")
                 break
+            
+            print("Данные успешно сохранены!")
 
 
 url = "https://market.yandex.ru/product--smartfon-apple-iphone-12-128gb/722974019/reviews?track=tabs"
