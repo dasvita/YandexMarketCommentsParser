@@ -72,7 +72,7 @@ def add_parsed_data_to_db(date, author, rating, comment):
 # записывает данные в базу данных функцией add_parsed_data_to_db(),
 # получает слыку на след. страницу функцией get_next_page_url(data),
 # выполняется пока получет новый url.
-# Принимает на вход url и headers для get запроса.
+# Принимает на входе url и headers для get запроса.
 def main_loop(url, headers):
     while True:
         try:
