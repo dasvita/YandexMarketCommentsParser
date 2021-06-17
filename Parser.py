@@ -1,9 +1,7 @@
-from sqlite3.dbapi2 import connect
 from bs4 import BeautifulSoup
 import requests
 import sqlite3
 import time
-from requests.api import head
 
 
 # Парсит html документ, возвращает спсок кортежей,
