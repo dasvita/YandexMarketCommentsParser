@@ -68,12 +68,8 @@ def add_parsed_data_to_db(date, author, rating, comment):
             print("Запись в SQLite закончена")
 
 
-# Основной цикл программы, вызывающий все остальные части.
-# Отправляет get запрос, парсит содержимое ответа функцией parse(),
-# записывает данные в базу данных функцией add_parsed_data_to_db(),
-# получает слыку на след. страницу функцией get_next_page_url(data),
-# выполняется пока получет новый url.
-def main():
+# Отправляет get запрос.
+def get_request():
     url = "https://market.yandex.ru/product--smartfon-apple-iphone-12-128gb/722974019/reviews?track=tabs"
 
     headers = {
@@ -91,34 +87,38 @@ def main():
             /537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36",
     }
 
+    response = requests.get(url, headers=headers)
+    response.encoding = "UTF-8"
+
+    return response
+
+
+# Основной цикл программы, вызывающий все остальные части.
+# Отправляет get запрос функцией get_request(),
+# парсит содержимое ответа функцией parse(),
+# записывает данные в базу данных функцией add_parsed_data_to_db(),
+# получает слыку на след. страницу функцией get_next_page_url(),
+# выполняется пока получет новый url.
+def main():
     while True:
-        try:
-            response = requests.get(url, headers=headers)
-            response.encoding = "UTF-8"
-            data = response.text
-            parsed_reviews = parse(data)
+        response = get_request()
+        parsed_reviews = parse(response.text)
 
-            for review in parsed_reviews:
-                add_parsed_data_to_db(
-                    parsed_reviews[parsed_reviews.index(review)][0],
-                    parsed_reviews[parsed_reviews.index(review)][1],
-                    parsed_reviews[parsed_reviews.index(review)][2],
-                    parsed_reviews[parsed_reviews.index(review)][3],
-                )
+        for review in parsed_reviews:
+            add_parsed_data_to_db(
+                parsed_reviews[parsed_reviews.index(review)][0],
+                parsed_reviews[parsed_reviews.index(review)][1],
+                parsed_reviews[parsed_reviews.index(review)][2],
+                parsed_reviews[parsed_reviews.index(review)][3],
+            )
 
-        except TypeError:
+        time.sleep(6)
+
+        url = get_next_page_url(response.text)
+
+        if url is None:
+            print("Вы в бане у Яндекса, попробуйте позже")
             break
-
-        finally:
-            time.sleep(6)
-
-            url = get_next_page_url(data)
-
-            if url is None:
-                print("Вы в бане у Яндекса, попробуйте позже")
-                break
-    
-    print("Данные успешно сохранены!")
             
 
 if __name__ == "__main__":
