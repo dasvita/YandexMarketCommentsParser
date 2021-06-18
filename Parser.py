@@ -23,7 +23,8 @@ def parse(html_data):
         rating_content = review.find("div", attrs={"itemprop": "reviewRating"})
         rating = rating_content.meta["content"]
 
-        comment_content = review.find("meta", attrs={"itemprop": "description"})
+        comment_content = review.find(
+            "meta", attrs={"itemprop": "description"})
         comment = comment_content["content"]
 
         review_tuple = (date, author, rating, comment)
@@ -72,8 +73,24 @@ def add_parsed_data_to_db(date, author, rating, comment):
 # записывает данные в базу данных функцией add_parsed_data_to_db(),
 # получает слыку на след. страницу функцией get_next_page_url(data),
 # выполняется пока получет новый url.
-# Принимает на входе url и headers для get запроса.
-def main_loop(url, headers):
+def main():
+    url = "https://market.yandex.ru/product--smartfon-apple-iphone-12-128gb/722974019/reviews?track=tabs"
+
+    headers = {
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image\
+            /avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "Accept-Language": "en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7",
+        "Connection": "keep-alive",
+        "Host": "market.yandex.ru",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-User": "?1",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit\
+            /537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36",
+    }
+
     while True:
         try:
             response = requests.get(url, headers=headers)
@@ -90,7 +107,6 @@ def main_loop(url, headers):
                 )
 
         except TypeError:
-            print("Вы в бане у Яндекса, попробуйте позже")
             break
 
         finally:
@@ -101,26 +117,8 @@ def main_loop(url, headers):
             if url is None:
                 print("Вы в бане у Яндекса, попробуйте позже")
                 break
-            
+
             print("Данные успешно сохранены!")
 
-
-url = "https://market.yandex.ru/product--smartfon-apple-iphone-12-128gb/722974019/reviews?track=tabs"
-
-headers = {
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image\
-    /avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-    "Accept-Language": "en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7",
-    "Connection": "keep-alive",
-    "Host": "market.yandex.ru",
-    "Sec-Fetch-Dest": "document",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-Site": "same-origin",
-    "Sec-Fetch-User": "?1",
-    "Upgrade-Insecure-Requests": "1",
-    "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit\
-    /537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36",
-}
-
-
-main_loop(url, headers)
+if __name__ == "__main__":
+    main()
